@@ -20,6 +20,7 @@ binds {
     super+shift+d { spawn-sh "dunstctl set-paused toggle; pkill -RTMIN+8 waybar"; }
     super+shift+e { quit; }
     super+slash { show-hotkey-overlay; }
+    super+shift+n { spawn-sh "pkill -USR1 gammastep"; }
 
     // Focus navigation
     super+Left  { focus-column-left; }

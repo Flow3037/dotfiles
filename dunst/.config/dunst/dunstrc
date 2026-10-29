@@ -5,9 +5,9 @@ min_icon_size = 64
 markup = full
 max_icon_size = 256
 gap_size = 2
-frame_color = "#585e6c"
+frame_color = "#5a5d6b"
 frame_width = 1
-highlight = "#d8bde3"
+highlight = "#e1bbdc"
 font = JetBrains Mono 11
 width = (320, 550)
 height = (50, 700)
@@ -19,23 +19,23 @@ progress_bar_min_width = 300
 progress_bar_max_width = 300
 padding = 6
 origin = top-right
-format = "<span foreground='#8d9199'>%a</span>\n<b>%s</b>\n%b"
+format = "<span foreground='#8f909a'>%a</span>\n<b>%s</b>\n%b"
 history_ignore = false
 
 [urgency_low]
-    background = "#282b31A6"
-    foreground = "#e1e2e8"
-    highlight = "#d8bde3"
+    background = "#292b31A6"
+    foreground = "#e3e2e9"
+    highlight = "#e1bbdc"
 
 [urgency_normal]
-    background = "#282b31A6"
-    foreground = "#e1e2e8"
-    highlight = "#d8bde3"
+    background = "#292b31A6"
+    foreground = "#e3e2e9"
+    highlight = "#e1bbdc"
 
 [urgency_critical]
     background = "#a7060fA6"
     foreground = "#ffffff"
-    highlight = "#d8bde3"
+    highlight = "#e1bbdc"
 
 [wifi]
     appname = wifi
