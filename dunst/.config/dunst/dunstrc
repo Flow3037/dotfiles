@@ -1,0 +1,59 @@
+[global]
+separator_height = 0
+separator_color= frame
+min_icon_size = 64
+markup = full
+max_icon_size = 256
+gap_size = 2
+frame_color = "#585e6c"
+frame_width = 1
+highlight = "#d8bde3"
+font = JetBrains Mono 11
+width = (320, 550)
+height = (50, 700)
+progress_bar = true
+progress_bar_height = 10
+progress_bar_corner_radius = 0
+progress_bar_frame_width = 1
+progress_bar_min_width = 300
+progress_bar_max_width = 300
+padding = 6
+origin = top-right
+format = "<span foreground='#8d9199'>%a</span>\n<b>%s</b>\n%b"
+history_ignore = false
+
+[urgency_low]
+    background = "#282b31A6"
+    foreground = "#e1e2e8"
+    highlight = "#d8bde3"
+
+[urgency_normal]
+    background = "#282b31A6"
+    foreground = "#e1e2e8"
+    highlight = "#d8bde3"
+
+[urgency_critical]
+    background = "#a7060fA6"
+    foreground = "#ffffff"
+    highlight = "#d8bde3"
+
+[wifi]
+    appname = wifi
+    summary = *
+    set_stack_tag = wifi
+    min_icon_size = 64
+    max_icon_size = 64
+
+[media]
+    appname = media
+    summary = *
+    set_stack_tag = 
+    min_icon_size = 72
+    max_icon_size = 72
+
+[CPU profile]
+    appname = CPU profile
+    summary = *
+    set_stack_tag = 
+    min_icon_size = 64
+    max_icon_size = 64   
