@@ -25,3 +25,7 @@ output_path = '~/.config/dunst/dunstrc'
 [templates.waybar]
 input_path = '~/.config/matugen/templates/waybar-colors.css'
 output_path = '~/.config/waybar/colors.css'
+
+[templates.gtk3]
+input_path = '~/.config/matugen/templates/matugen-gtk.css'
+output_path = '~/.local/share/themes/val-adw/gtk-3.0/colors.css'
