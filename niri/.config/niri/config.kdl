@@ -653,3 +653,4 @@ spawn-at-startup "noctalia"
 debug {
     honor-xdg-activation-with-invalid-serial
 }
+spawn-at-startup "/usr/lib/pam_kwallet_init"
