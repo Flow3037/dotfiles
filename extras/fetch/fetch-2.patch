@@ -1,17 +1,18 @@
 diff --git a/fetch.c b/fetch.c
-index fe245b4..2e821b5 100644
+index fe245b4..702e537 100644
 --- a/fetch.c
 +++ b/fetch.c
-@@ -35,6 +35,8 @@ static void queue_exit() {
+@@ -35,6 +35,9 @@ static void queue_exit() {
  }
  
  static void cleanup(void) {
 +  // Throw away the key that stopped the animation so the shell doesn't get it
-+  tcflush(STDIN_FILENO, TCIFLUSH);
++  if (termios_saved)
++    tcflush(STDIN_FILENO, TCIFLUSH);
    if (termios_saved)
      tcsetattr(STDIN_FILENO, TCSANOW, &orig_termios);
    printf("\033[?25h");
-@@ -1425,7 +1427,8 @@ static void gather_shell(void) {
+@@ -1425,7 +1428,8 @@ static void gather_shell(void) {
        char *ver = strstr(buf, name);
        if (ver) {
          ver += strlen(name);
@@ -21,7 +22,7 @@ index fe245b4..2e821b5 100644
            ver++;
        } else {
          // Try to find first digit
-@@ -2085,30 +2088,53 @@ static void gather_disk(void) {
+@@ -2085,30 +2089,53 @@ static void gather_disk(void) {
      add_info("Disk (/)", "%.2f GiB / %.2f GiB (\033[%sm%d%%\033[0m)", used_gib,
               total_gib, color, pct);
  #else
@@ -92,7 +93,78 @@ index fe245b4..2e821b5 100644
  #endif
  }
  
-@@ -3262,7 +3288,21 @@ int main(int argc, char **argv) {
+@@ -2869,6 +2896,7 @@ int main(int argc, char **argv) {
+   int show_info = 1;
+   int use_color = 1;
+   int max_frames = 2000;
++  int static_mode = 0;
+   const char *shading = ".,-~:;=!*#$@";
+ 
+   for (int i = 1; i < argc; i++) {
+@@ -2901,6 +2929,7 @@ int main(int argc, char **argv) {
+           "  --frames <n>              Stop after n frames (default 2000)\n"
+           "  --infinite                Run forever (keypress or Ctrl-C to "
+           "exit)\n"
++          "  --static                  Print the flat logo once, no animation\n"
+           "  --shading-chars <str>     Custom shading ramp, supports UTF-8\n"
+           "                            Default: .,-~:;=!*#$@\n"
+           "                            Example: ' ░▒▓█'\n"
+@@ -2953,6 +2982,8 @@ int main(int argc, char **argv) {
+       max_frames = atoi(argv[++i]);
+     } else if (strcmp(argv[i], "--infinite") == 0) {
+       max_frames = 0;
++    } else if (strcmp(argv[i], "--static") == 0) {
++      static_mode = 1; // draw one flat frame where the cursor is, then exit
+     } else if (strcmp(argv[i], "--shading-chars") == 0 && i + 1 < argc) {
+       shading = argv[++i];
+     } else if (strcmp(argv[i], "--height") == 0 && i + 1 < argc) {
+@@ -3104,7 +3135,10 @@ int main(int argc, char **argv) {
+ 
+   int fetch_start = show_info ? 1 : 0;
+ 
+-  if (tcgetattr(STDIN_FILENO, &orig_termios) == 0) {
++  if (static_mode)
++    is_exiting = true; // the "exit" frame is the flat one, so just draw that
++
++  if (!static_mode && tcgetattr(STDIN_FILENO, &orig_termios) == 0) {
+     termios_saved = 1;
+     struct termios raw = orig_termios;
+     raw.c_lflag &= ~(ICANON | ECHO);
+@@ -3113,13 +3147,18 @@ int main(int argc, char **argv) {
+     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+   }
+ 
+-  printf("\033[?25l\033[2J");
+-  fflush(stdout);
++  if (!static_mode) {
++    printf("\033[?25l\033[2J");
++    fflush(stdout);
++  }
+ 
+   for (int frame = 0; max_frames == 0 || frame < max_frames; frame++) {
+     struct pollfd pfd = {.fd = STDIN_FILENO, .events = POLLIN};
+     if (poll(&pfd, 1, 0) > 0) //<-------------------------------------------------
+       queue_exit();
++    // Last frame of a timed run: snap flat and trim like a keypress would
++    if (max_frames > 0 && frame == max_frames - 1)
++      queue_exit();
+     // Handle terminal resize: recompute the same layout as startup
+     if (term_resized) {
+       term_resized = 0;
+@@ -3248,8 +3287,10 @@ int main(int argc, char **argv) {
+     }
+     char *p = out_buf;
+     char *end = out_buf + need - 8;
+-    *p++ = '\033'; *p++ = '[';
+-    *p++ = 'H';
++    if (!static_mode) { // static mode prints in place, no jump to the top
++      *p++ = '\033'; *p++ = '[';
++      *p++ = 'H';
++    }
+ 
+     // Pre-formatted reset + newline sequences
+     const char reset_seq[] = "\033[0m";
+@@ -3262,7 +3303,21 @@ int main(int argc, char **argv) {
      int inner_len = strlen(color_inner);
      int outer_len = strlen(color_outer);
  
@@ -115,7 +187,7 @@ index fe245b4..2e821b5 100644
        if (!use_color) {
          for (int j = 0; j < aw && p + 4 < end; j++) {
            int ci = shade_idx[i][j];
-@@ -3335,13 +3375,17 @@ int main(int argc, char **argv) {
+@@ -3335,13 +3390,17 @@ int main(int argc, char **argv) {
        }
      }
      
