@@ -1,0 +1,30 @@
+# info lines, shown in this order (delete or comment out to hide)
+os
+host
+kernel
+uptime
+packages
+shell
+display
+wm
+terminal
+cpu
+gpu
+memory
+disk
+ip
+
+# appearance
+label_color=cyan
+separator=─
+
+# logo colours (override the defaults)
+logo_outer=cyan
+logo_inner=green
+
+# 3D
+light=top-left
+spin=y
+speed=0.8
+size=1.0
+depth=1.5
