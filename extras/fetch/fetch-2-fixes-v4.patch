@@ -1,0 +1,137 @@
+diff --git a/fetch.c b/fetch.c
+index fe245b4..2e821b5 100644
+--- a/fetch.c
++++ b/fetch.c
+@@ -35,6 +35,8 @@ static void queue_exit() {
+ }
+ 
+ static void cleanup(void) {
++  // Throw away the key that stopped the animation so the shell doesn't get it
++  tcflush(STDIN_FILENO, TCIFLUSH);
+   if (termios_saved)
+     tcsetattr(STDIN_FILENO, TCSANOW, &orig_termios);
+   printf("\033[?25h");
+@@ -1425,7 +1427,8 @@ static void gather_shell(void) {
+       char *ver = strstr(buf, name);
+       if (ver) {
+         ver += strlen(name);
+-        while (*ver == ' ')
++        // skip things like ", version " (fish, bash) to reach the number
++        while (*ver && !(*ver >= '0' && *ver <= '9'))
+           ver++;
+       } else {
+         // Try to find first digit
+@@ -2085,30 +2088,53 @@ static void gather_disk(void) {
+     add_info("Disk (/)", "%.2f GiB / %.2f GiB (\033[%sm%d%%\033[0m)", used_gib,
+              total_gib, color, pct);
+ #else
+-  // Get filesystem type from /proc/mounts
+-  char fstype[32] = "";
+-  FILE *fp = fopen("/proc/mounts", "r");
+-  if (fp) {
++  // Root first, then any real drives mounted under /mnt, /media or /run/media
++  (void)total_gib; (void)used_gib; (void)pct; (void)color;
++  const char *prefixes[] = {"/", "/mnt/", "/media/", "/run/media/"};
++  for (int pass = 0; pass < 2; pass++) {
++    FILE *fp = fopen("/proc/mounts", "r");
++    if (!fp)
++      return;
+     char buf[512];
+     while (fgets(buf, sizeof(buf), fp)) {
+-      // Format: device mountpoint fstype options ...
+       char dev[128], mnt[128], fs[32];
+-      if (sscanf(buf, "%127s %127s %31s", dev, mnt, fs) == 3) {
+-        if (strcmp(mnt, "/") == 0) {
+-          strncpy(fstype, fs, sizeof(fstype) - 1);
+-          break;
+-        }
++      if (sscanf(buf, "%127s %127s %31s", dev, mnt, fs) != 3)
++        continue;
++      int is_root = strcmp(mnt, "/") == 0;
++      if (pass == 0 && !is_root)
++        continue;
++      if (pass == 1) {
++        if (is_root || strncmp(dev, "/dev/", 5) != 0)
++          continue;
++        int match = 0;
++        for (int i = 1; i < 4; i++)
++          if (strncmp(mnt, prefixes[i], strlen(prefixes[i])) == 0)
++            match = 1;
++        if (!match)
++          continue;
+       }
++      struct statvfs m;
++      if (statvfs(mnt, &m) != 0 || m.f_blocks == 0)
++        continue;
++      double tot = (double)m.f_blocks * m.f_frsize;
++      double fre = (double)m.f_bfree * m.f_frsize;
++      double use = tot - fre;
++      int p = (int)(use * 100 / tot);
++      const char *c = p >= 80 ? "31" : p >= 50 ? "93" : "32";
++      const double GiB = 1024.0 * 1024 * 1024, TiB = GiB * 1024;
++      char label[160];
++      snprintf(label, sizeof(label), "Disk (%s)", mnt);
++      if (tot >= TiB)
++        add_info(label, "%.2f TiB / %.2f TiB (\033[%sm%d%%\033[0m) - %s",
++                 use / TiB, tot / TiB, c, p, fs);
++      else
++        add_info(label, "%.2f GiB / %.2f GiB (\033[%sm%d%%\033[0m) - %s",
++                 use / GiB, tot / GiB, c, p, fs);
++      if (pass == 0)
++        break;
+     }
+     fclose(fp);
+   }
+-
+-  if (fstype[0])
+-    add_info("Disk (/)", "%.2f GiB / %.2f GiB (\033[%sm%d%%\033[0m) - %s",
+-             used_gib, total_gib, color, pct, fstype);
+-  else
+-    add_info("Disk (/)", "%.2f GiB / %.2f GiB (\033[%sm%d%%\033[0m)", used_gib,
+-             total_gib, color, pct);
+ #endif
+ }
+ 
+@@ -3262,7 +3288,21 @@ int main(int argc, char **argv) {
+     int inner_len = strlen(color_inner);
+     int outer_len = strlen(color_outer);
+ 
+-    for (int i = 0; i < render_height && p + 8 < end; i++) {
++    // On the last frame, stop after the last row that has something in it,
++    // so the prompt lands right under the fetch instead of far below it.
++    int rows_to_draw = render_height;
++    if (is_exiting && !layout_stacked) {
++      int last = -1;
++      for (int i = 0; i < render_height; i++)
++        for (int j = 0; j < aw; j++)
++          if (shade_idx[i][j] >= 0) { last = i; break; }
++      if (show_info && fetch_start + fetch_line_count - 1 > last)
++        last = fetch_start + fetch_line_count - 1;
++      if (last + 2 < rows_to_draw)
++        rows_to_draw = last + 2;
++    }
++
++    for (int i = 0; i < rows_to_draw && p + 8 < end; i++) {
+       if (!use_color) {
+         for (int j = 0; j < aw && p + 4 < end; j++) {
+           int ci = shade_idx[i][j];
+@@ -3335,13 +3375,17 @@ int main(int argc, char **argv) {
+       }
+     }
+     
++    // Wipe anything left below the last frame
++    if (is_exiting && p + 4 < end) {
++      memcpy(p, "\033[J", 3); p += 3;
++    }
++
+     // If character pressed or exiting, break out of the loop.
+     if (write(STDOUT_FILENO, out_buf, p - out_buf) < 0 || is_exiting)
+   		break;
+     usleep(50000);
+   }
+   
+-  printf("\033[?25h");
+-  fflush(stdout);
++  cleanup(); // restore the terminal and drop the key that was pressed
+   return 0;
+ }
