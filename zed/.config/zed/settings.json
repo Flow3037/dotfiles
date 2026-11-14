@@ -1,0 +1,36 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "ssh_connections": [
+    {
+      "host": "login.cse.unsw.edu.au",
+      "username": "z5765607",
+      "args": [],
+      "projects": [
+        {
+          "paths": [
+            "/mnt/accounts/user/07/z5765607/comp1511/./"
+          ]
+        }
+      ]
+    }
+  ],
+  "base_keymap": "VSCode",
+  "icon_theme": "Zed (Default)",
+  "ui_font_size": 16,
+  "buffer_font_size": 15,
+  "theme": {
+    "mode": "dark",
+    "light": "One Light",
+    "dark": "One Dark",
+  },
+  "project_panel": { "dock": "left" },
+  "terminal": { "dock": "right" },
+  "wrap_guides": [80]
+}
