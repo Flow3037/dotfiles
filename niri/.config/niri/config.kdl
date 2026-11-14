@@ -311,3 +311,26 @@ binds {
     Mod+B hotkey-overlay-title="Open Brave" { spawn "brave"; }
     Mod+Return hotkey-overlay-title="Open Terminal" { spawn "kitty"; }
 }
+
+// blur behind see-through windows
+blur {
+    passes 3
+    offset 3
+    noise 0.013
+    saturation 1.3
+}
+
+window-rule {
+    match app-id="kitty"
+    background-effect {
+        blur true
+    }
+}
+
+window-rule {
+    match app-id="[Tt]hunar"
+    opacity 0.92
+    background-effect {
+        blur true
+    }
+}
