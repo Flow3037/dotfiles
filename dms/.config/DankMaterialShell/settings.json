@@ -199,8 +199,8 @@
   "networkPreference": "auto",
   "iconTheme": "System Default",
   "cursorSettings": {
-    "theme": "System Default",
-    "size": 24,
+    "theme": "WhiteSur-cursors",
+    "size": 34,
     "niri": {
       "hideWhenTyping": false,
       "hideAfterInactiveMs": 0
