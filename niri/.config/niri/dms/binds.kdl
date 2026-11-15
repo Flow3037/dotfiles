@@ -1,7 +1,5 @@
 binds {
     // === System & Overview ===
-    Mod+D repeat=false { toggle-overview; }
-    Mod+Tab repeat=false { toggle-overview; }
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     // === Application Launchers ===
@@ -141,9 +139,6 @@ binds {
     Mod+Ctrl+I         { move-column-to-workspace-up; }
 
     // === Workspace Management ===
-    Ctrl+Shift+R hotkey-overlay-title="Rename Workspace" {
-        spawn "dms" "ipc" "call" "workspace-rename" "open";
-    }
 
     // === Move Workspaces ===
     Mod+Shift+Page_Down { move-workspace-down; }
