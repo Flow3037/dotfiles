@@ -4,23 +4,30 @@ binds {
     super+shift+W { toggle-column-tabbed-display; }
     super+Q repeat=false { close-window; }
     super+Shift+V { toggle-window-floating; }
-    // super+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
+    super+Ctrl+V { switch-focus-between-floating-and-tiling; }
+    super+C { center-column; }
+    super+Ctrl+C { center-visible-columns; }
+    super+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
+    super+Shift+P { power-off-monitors; }
 
     super+Return { spawn "kitty"; }
+    super+T { spawn "kitty"; }
 
     // launchers and menus (rofi replaces their private quickshell)
-    super+d { spawn "rofi" "-show" "drun"; }
     super+space { spawn "rofi" "-show" "drun"; }
     super+v { spawn-sh "cliphist list | rofi -dmenu -p Clipboard | cliphist decode | wl-copy"; }
     super+e { spawn "thunar"; }
-    super+n { spawn "kitty" "-e" "yazi"; }
+    super+n { spawn-sh "dunstctl history-pop"; }
     super+b { spawn "brave"; }
-    super+z { spawn-sh "~/.local/bin/wallpick.sh"; }
-    super+shift+z { spawn-sh "~/.local/bin/wall.sh"; }
+    super+y { spawn-sh "~/.local/bin/wallpick.sh"; }
+    super+shift+y { spawn-sh "~/.local/bin/wall.sh"; }
     super+shift+d { spawn-sh "dunstctl set-paused toggle; pkill -RTMIN+8 waybar"; }
     super+shift+e { quit; }
     super+slash { show-hotkey-overlay; }
-    super+p { spawn-sh "~/.local/bin/powermenu.sh"; }
+    super+shift+slash { show-hotkey-overlay; }
+    super+x { spawn-sh "~/.local/bin/powermenu.sh"; }
+    super+m { spawn "kitty" "-e" "btop"; }
+    Ctrl+Alt+Delete { spawn "kitty" "-e" "btop"; }
     super+shift+n { spawn-sh "pkill -USR1 gammastep"; }
 
     // Focus navigation
@@ -116,7 +123,6 @@ binds {
     // Consume / Expel windows
     super+BracketLeft  { consume-or-expel-window-left; }
     super+BracketRight { consume-or-expel-window-right; }
-    super+Comma  { consume-window-into-column; }
     super+Period { expel-window-from-column; }
 
     // Sizing presets & modes
@@ -128,10 +134,10 @@ binds {
     super+Ctrl+F { expand-column-to-available-width; }
 
     // Manual size adjustments
-    super+Minus { set-column-width "-5%"; }
-    super+Equal { set-column-width "+5%"; }
-    super+Shift+Minus { set-window-height "-5%"; }
-    super+Shift+Equal { set-window-height "+5%"; }
+    super+Minus { set-column-width "-10%"; }
+    super+Equal { set-column-width "+10%"; }
+    super+Shift+Minus { set-window-height "-10%"; }
+    super+Shift+Equal { set-window-height "+10%"; }
 
     // === Mouse Wheel Bindings ===
     super+Alt+WheelScrollDown       cooldown-ms=50 { focus-workspace-down; }
@@ -168,5 +174,5 @@ binds {
     Print { screenshot; }
     Ctrl+Print { screenshot-screen; }
     Alt+Print { screenshot-window; }
-    super+X { screenshot; }
+    super+Shift+S { screenshot; }
 }

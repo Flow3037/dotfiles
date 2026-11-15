@@ -1,7 +1,16 @@
 recent-windows {
+    // Super+Tab: windows on this workspace. Alt+Tab: all windows on this
+    // screen. Add ` (grave) for the current app only. Shift goes backwards.
+    // Same on desktop and laptop.
     binds {
-        Mod+Tab         { next-window  scope="workspace"; }
+        Mod+Tab         { next-window     scope="workspace"; }
         Mod+Shift+Tab   { previous-window scope="workspace"; }
+        Alt+Tab         { next-window     scope="output"; }
+        Alt+Shift+Tab   { previous-window scope="output"; }
+        Mod+grave       { next-window     filter="app-id"; }
+        Mod+Shift+grave { previous-window filter="app-id"; }
+        Alt+grave       { next-window     filter="app-id"; }
+        Alt+Shift+grave { previous-window filter="app-id"; }
     }
 }
 
