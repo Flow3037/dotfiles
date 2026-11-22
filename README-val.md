@@ -14,3 +14,5 @@ HP V22 (HDMI-A-1, left) + AOC Q27G11E (DP-2, 180 Hz).
 Keys: Super+D or Super+Space apps, Super+V clipboard, Super+E thunar, Super+N yazi,
 Super+B brave, Super+Z pick wallpaper, Super+Shift+Z random wallpaper, Super+W overview,
 Super+Shift+arrows move windows, Super+Ctrl+arrows switch monitor, Super+Shift+E log out.
+
+Setup: paru -S --needed - < extras/packages-val.txt, then create ~/.config/gammastep/config.ini with your location (kept out of the repo).
