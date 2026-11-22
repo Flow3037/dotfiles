@@ -1,0 +1,9 @@
+niri
+xwayland-satellite
+fish
+stow
+git
+xdg-desktop-portal-gnome
+nwg-look
+kitty
+noctalia
